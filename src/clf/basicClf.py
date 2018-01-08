@@ -16,6 +16,7 @@ class basicClf():
         self.train_step = train_step
         self.batch_size = batch_size
         self.training_size = training_size
+        self.trainingScore = None
 
     def fit(self, data, outputFile):
         """ Train the model """
@@ -25,7 +26,8 @@ class basicClf():
             for _ in range(self.training_size):
                 batch_xs, batch_ys = data.train.next_batch(self.batch_size)
                 sess.run(self.train_step, feed_dict={self.x: batch_xs, self.y_: batch_ys})
-        saver.save(sess, outputFile + "_model")
+            saver.save(sess, outputFile + "_model")
 
     def returnTrainingScores(self):
-        """ Return the Scores of the training """
+        """ Return the Scores of the training need to be added """
+        return self.trainingScore

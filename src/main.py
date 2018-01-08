@@ -7,6 +7,23 @@ import tensorflow as tf
 
 FLAGS = None
 
+def makeOutputDir(outputDir, outputName):
+    import os
+    overwrite= False
+    tempOutputDir= outputDir
+    tempOutputName= outputName
+    while (os.path.exists(tempOutputDir) & (not overwrite)):
+        overwrite_string= raw_input(tempOutputDir+" allready exists, overwrite y/n? ")
+        if  overwrite_string== "y":
+            overwrite= True
+        elif overwrite_string=="n":
+            fileExtension= raw_input("then enter a file extension! ")
+            tempOutputDir= outputDir[:-1]+fileExtension+"/"
+            tempOutputName= outputName+fileExtension
+    if not os.path.exists(tempOutputDir):
+            os.makedirs(tempOutputDir)
+    return tempOutputDir, tempOutputName
+
 def main(_):
     """ Runs the gridSearch """
     from clf import someClf
@@ -16,8 +33,7 @@ def main(_):
 
     mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
 
-    outputDir = "../output/"
-    outputName = "model"
+    outputDir , outputName = makeOutputDir("../output/", "model")
 
     someClf = someClf.clfHandler(outputDir, outputName, batch_size=100, training_size=1000)
 

@@ -7,13 +7,13 @@ from evaluation import evaluaterSearch
 from clf import clfSearch
 
 
-def _parallel_fit_eval(process_number, data, clf, evaluators, scoring):
+def _parallel_fit_eval(process_number, data, clfs, evaluators, scoring):
     """ Function for fitting and evaluating a model. It returns the results after fitting and evaluation. """
-    clf[process_number].fit(data, process_number)
+    clfs[process_number].fit(data, process_number)
 
     results = dict()
 
-    results["train_score_" + str(process_number)] = (clf[process_number].returnTrainingScores())
+    results["train_score_" + str(process_number)] = (clfs[process_number].returnTrainingScores())
 
     evaluators[process_number].evaluate(data, process_number, scoring)
 
@@ -95,9 +95,9 @@ class MultiModelSearch(object):
         for number in clf_numbers:
             for name in names_results:
                 if name not in self.results:
-                    self.results[name] = [results[number][name + "_" + str(number)]]
+                    self.results[name] = [results[number][name + "_test_score_" + str(number)]]
                 else:
-                    self.results[name].append(results[number][name + "_" + str(number)])
+                    self.results[name].append(results[number][name + "_test_score_" + str(number)])
 
     def _generate_results(self, clf, para_key, value):
         """ Puts the choosen values for each ranker to the result dict """
@@ -120,7 +120,7 @@ class MultiModelSearch(object):
     def fit_and_eval(self):
         """ Running the training for all rankers and all parameters """
         clf_numbers = range(len(self.clfs))
-        _parallel_fit_eval_number = partial(_parallel_fit_eval, self.data, clf=self.clfs,
+        _parallel_fit_eval_number = partial(_parallel_fit_eval, data=self.data, clfs=self.clfs,
                                             evaluators=self.evaluators, scoring=self.scoring)
         pool = Pool()
         fit_and_eval_results = pool.map(_parallel_fit_eval_number, clf_numbers)
@@ -149,10 +149,11 @@ class MultiModelSearch(object):
         for scorer, color in zip(sorted(scoringName), ['g', 'k']):
             for sample, style in (('train', '--'), ('test', '-')):
                 sample_score_mean = self.results['%s_%s_score' % (scorer, sample)]
-                sample_score_std = self.results['std_%s_%s' % (sample, scorer)]
-                ax.fill_between(X_axis, sample_score_mean - sample_score_std,
-                                sample_score_mean + sample_score_std,
-                                alpha=0.1 if sample == 'test' else 0, color=color)
+                # ToDo also for training values
+                #sample_score_std = self.results['std_%s_%s' % (sample, scorer)]
+                #ax.fill_between(X_axis, sample_score_mean - sample_score_std,
+                #                sample_score_mean + sample_score_std,
+                #                alpha=0.1 if sample == 'test' else 0, color=color)
                 ax.plot(X_axis, sample_score_mean, style, color=color,
                         alpha=1 if sample == 'test' else 0.7,
                         label="%s (%s)" % (scorer, sample))

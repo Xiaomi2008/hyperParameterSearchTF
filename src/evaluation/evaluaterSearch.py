@@ -12,7 +12,7 @@ class evaluaterSearch():
         setattr(self.evaluater, self.new_para[0], self.new_para[1])
         newInputFile = self.evaluater.inputDir + self.evaluater.inputName + "_" + str(process_number)
         setattr(self.evaluater, "inputFile", newInputFile)
-        self.evaluater.evaluate(data, process_number)
+        self.evaluater.evaluate(data)
         tmp_result = dict()
         for score in scoring:
             check_score = getattr(self.evaluater, scoring[score])
