@@ -7,12 +7,12 @@ class evaluaterSearch():
         self.new_para = new_para
         self.results = None
 
-    def evaluate(self, x, y, z, process_number, scoring):
+    def evaluate(self, data, process_number, scoring):
         """ Starts to evaluate all saved models and collects the scoring data """
         setattr(self.evaluater, self.new_para[0], self.new_para[1])
         newInputFile = self.evaluater.inputDir + self.evaluater.inputName + "_" + str(process_number)
         setattr(self.evaluater, "inputFile", newInputFile)
-        self.evaluater.evaluate(x, y, z, process_number)
+        self.evaluater.evaluate(data, process_number)
         tmp_result = dict()
         for score in scoring:
             check_score = getattr(self.evaluater, scoring[score])

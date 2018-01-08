@@ -3,16 +3,16 @@ class clfSearch():
 
     def __init__(self, clf, new_para):
         """ clfsearch """
-        self.trainingScore = None
         self.clf = clf
         self.new_para = new_para
+        self.trainingScore = None
 
-    def fit(self, x, y, z, process_number):
+    def fit(self, data, process_number):
         """ Fit """
         setattr(self.clf, self.new_para[0], self.clf[1])
         newOutputFile = "defaultDirName_" + str(process_number)
         setattr(self.clf, "outputFile", newOutputFile)
-        self.clf.fit(x, y, z)
+        self.clf.fit(data)
         self.trainingScore = self.clf.returnTrainingScores()
 
     def returnTrainingScore(self):

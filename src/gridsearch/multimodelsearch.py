@@ -7,15 +7,15 @@ from evaluation import evaluaterSearch
 from clf import clfSearch
 
 
-def _parallel_fit_eval(process_number, x_train, y_train, z_train, x_test, y_test, z_test, clf, evaluators, scoring):
+def _parallel_fit_eval(process_number, data, clf, evaluators, scoring):
     """ Function for fitting and evaluating a model. It returns the results after fitting and evaluation. """
-    clf[process_number].fit(x_train, y_train, z_train, process_number)
+    clf[process_number].fit(data, process_number)
 
     results = dict()
 
     results["train_score_" + str(process_number)] = (clf[process_number].returnTrainingScores())
 
-    evaluators[process_number].evaluate(x_test, y_test, z_test, process_number, scoring)
+    evaluators[process_number].evaluate(data, process_number, scoring)
 
     for key in evaluators[process_number].results.keys():
         results[key + '_test_score_' + str(process_number)] = [evaluators[process_number].results[key]]
@@ -91,8 +91,7 @@ class MultiModelSearch(object):
     def _update_result(self, results, clf_numbers):
         """ Updates the scores in the result dict after an evaluator finished """
         # ToDo make results of scoring values dynamic
-        names_results = ['AUC_train_score', 'AUC_test_score', 'train_time']
-        # 'mean_fit_time' 'std_fit_time' 'AUC_train_score'
+        names_results = ['Accuracy']
         for number in clf_numbers:
             for name in names_results:
                 if name not in self.results:
@@ -100,9 +99,9 @@ class MultiModelSearch(object):
                 else:
                     self.results[name].append(results[number][name + "_" + str(number)])
 
-    def _generate_results(self, ranker, para_key, value):
+    def _generate_results(self, clf, para_key, value):
         """ Puts the choosen values for each ranker to the result dict """
-        for att in dir(ranker):
+        for att in dir(clf):
             if not att.startswith('_'):
                 if att == 'X' or att == 'Y' or att == 'W':
                     continue
@@ -111,24 +110,21 @@ class MultiModelSearch(object):
                         if att == para_key:
                             self.results['param_' + att].append(value)
                         else:
-                            self.results['param_' + att].append(getattr(ranker, att))
+                            self.results['param_' + att].append(getattr(clf, att))
                     else:
                         if att == para_key:
                             self.results['param_' + att] = [value]
                         else:
-                            self.results['param_' + att] = [getattr(ranker, att)]
+                            self.results['param_' + att] = [getattr(clf, att)]
 
     def fit_and_eval(self):
         """ Running the training for all rankers and all parameters """
-        ranker_numbers = range(len(self.clfs))
-        x_train, y_train, z_train = self.data.get_train()
-        x_test, y_test, z_test = self.data.get_test()
-        _parallel_fit_eval_number = partial(_parallel_fit_eval, x_train=x_train, y_train=y_train, z_train=z_train,
-                                            x_test=x_test, y_test=y_test, z_test=z_test, rankers=self.clfs,
+        clf_numbers = range(len(self.clfs))
+        _parallel_fit_eval_number = partial(_parallel_fit_eval, self.data, clf=self.clfs,
                                             evaluators=self.evaluators, scoring=self.scoring)
         pool = Pool()
-        fit_and_eval_results = pool.map(_parallel_fit_eval_number, ranker_numbers)
-        self._update_result(fit_and_eval_results, ranker_numbers)
+        fit_and_eval_results = pool.map(_parallel_fit_eval_number, clf_numbers)
+        self._update_result(fit_and_eval_results, clf_numbers)
 
     def plotResults(self, resultName, scoringName):
         """ From http://scikit-learn.org/stable/auto_examples/model_selection/plot_multi_metric_evaluation.html """
