@@ -26,7 +26,7 @@ def makeOutputDir(outputDir, outputName):
 
 def main(_):
     """ Runs the gridSearch """
-    from clf import someClf
+    from clf import classifier
     from evaluation import evaluator
     from gridsearch import multimodelsearch
     from tensorflow.examples.tutorials.mnist import input_data
@@ -35,7 +35,7 @@ def main(_):
 
     outputDir , outputName = makeOutputDir("../output/", "model")
 
-    someClf = someClf.clfHandler(outputDir, outputName, batch_size=100, training_size=1000)
+    someClf = classifier.classifier(outputDir, outputName, batch_size=100, training_size=1000)
 
     parameter = {"batch_size": [100,200,300],
                  "training_size": [1000,2000,3000]
@@ -43,7 +43,7 @@ def main(_):
 
     scoring = {"Accuracy": "accuracy"}
 
-    clfEvaluator = evaluator.evalHandler(inputDir=outputDir, inputName=outputName)
+    clfEvaluator = evaluator.evaluator(inputDir=outputDir, inputName=outputName)
 
     parameter = (someClf, parameter, clfEvaluator)
 
