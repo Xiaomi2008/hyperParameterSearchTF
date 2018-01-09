@@ -18,7 +18,7 @@ def _parallel_fit_eval(process_number, data, clfs, evaluators, scoring):
     evaluators[process_number].evaluate(data, process_number, scoring)
 
     for key in evaluators[process_number].results.keys():
-        results[key + '_test_score_' + str(process_number)] = [evaluators[process_number].results[key]]
+        results[key + '_test_score_' + str(process_number)] = evaluators[process_number].results[key]
 
     return results
 
@@ -128,49 +128,57 @@ class MultiModelSearch(object):
 
     def plotResults(self, resultName, scoringName):
         """ From http://scikit-learn.org/stable/auto_examples/model_selection/plot_multi_metric_evaluation.html """
-        plt.figure(figsize=(13, 13))
-        plt.title("GridSearchCV evaluating using multiple scorers simultaneously",
-                  fontsize=16)
+        for result in resultName:
 
-        plt.xlabel(resultName[0])
-        plt.ylabel("Score")
-        plt.grid()
+            plt.figure(figsize=(13, 13))
+            plt.title("GridSearchCV evaluating using multiple scorers simultaneously", fontsize=16)
 
-        ax = plt.axes()
-        ax.set_xlim(0, len(self.results['param_' + resultName[0]]))
-        ax.set_ylim(0, 1)
+            plt.xlabel(result)
+            plt.ylabel("Score")
+            plt.grid()
 
-        # Get the regular numpy array from the MaskedArray
-        X_axis = np.array(range(len(self.results['param_' + resultName[0]])), dtype=float)
-        xticks = []
-        for xpoint in self.results['param_' + resultName[0]]:
-            xticks.append(str(xpoint))
-        plt.xticks(X_axis, xticks)
-        for scorer, color in zip(sorted(scoringName), ['g', 'k']):
-            for sample, style in (('train', '--'), ('test', '-')):
-                sample_score_mean = self.results['%s_%s_score' % (scorer, sample)]
-                # ToDo also for training values
-                #sample_score_std = self.results['std_%s_%s' % (sample, scorer)]
-                #ax.fill_between(X_axis, sample_score_mean - sample_score_std,
-                #                sample_score_mean + sample_score_std,
-                #                alpha=0.1 if sample == 'test' else 0, color=color)
-                ax.plot(X_axis, sample_score_mean, style, color=color,
-                        alpha=1 if sample == 'test' else 0.7,
-                        label="%s (%s)" % (scorer, sample))
-            best_index = np.where(self.results['%s_test_score' % scorer] ==
-                                  np.array(self.results['%s_test_score' % (scorer)]).max())[0][0]
-            best_score = self.results['%s_test_score' % scorer][best_index]
-            # If there are more best_scores then take the first one
-            if type(best_score) == list:
-                best_score = best_score[0]
-            # Plot a dotted vertical line at the best score for that scorer marked by x
-            ax.plot([X_axis[best_index], ] * 2, [0, best_score],
-                    linestyle='-.', color=color, marker='x', markeredgewidth=3, ms=8)
+            ax = plt.axes()
+            ax.set_xlim(0, len(self.results['param_' + result]))
+            ax.set_ylim(0, 1)
 
-            # Annotate the best score for that scorer
-            ax.annotate("%0.2f" % best_score,
-                        (X_axis[best_index], best_score + 0.005))
+            # Get the regular numpy array from the MaskedArray
+            X_axis = np.array(range(len(self.results['param_' + result])), dtype=float)
+            xticks = []
+            for xpoint in self.results['param_' + result]:
+                xticks.append(str(xpoint))
+            plt.xticks(X_axis, xticks)
+            for scorer, color in zip(sorted(scoringName), ['g', 'k']):
+                for sample, style in (('train', '--'), ('test', '-')):
+                    # ToDo Add train scores
+                    if  sample == "train":
+                        continue
+                    sample_score_mean = self.results['%s' % (scorer)]
+                    #sample_score_mean = self.results['%s_%s_score' % (scorer, sample)]
+                    # ToDo Add std results
+                    #sample_score_std = self.results['std_%s_%s' % (sample, scorer)]
+                    #ax.fill_between(X_axis, sample_score_mean - sample_score_std,
+                    #                sample_score_mean + sample_score_std,
+                    #                alpha=0.1 if sample == 'test' else 0, color=color)
+                    ax.plot(X_axis, sample_score_mean, style, color=color,
+                            alpha=1 if sample == 'test' else 0.7,
+                            label="%s (%s)" % (scorer, sample))
+                best_index = np.where(self.results['%s' % scorer] ==
+                                      np.array(self.results['%s' % (scorer)]).max())[0][0]
+                best_score = self.results['%s' % scorer][best_index]
+                #best_index = np.where(self.results['%s_test_score' % scorer] ==
+                #                      np.array(self.results['%s_test_score' % (scorer)]).max())[0][0]
+                #best_score = self.results['%s_test_score' % scorer][best_index]
+                # If there are more best_scores then take the first one
+                if type(best_score) == list:
+                    best_score = best_score[0]
+                # Plot a dotted vertical line at the best score for that scorer marked by x
+                ax.plot([X_axis[best_index], ] * 2, [0, best_score],
+                        linestyle='-.', color=color, marker='x', markeredgewidth=3, ms=8)
 
-        plt.legend(loc="best")
-        plt.grid('off')
-        plt.show()
+                # Annotate the best score for that scorer
+                ax.annotate("%0.2f" % best_score,
+                            (X_axis[best_index], best_score + 0.005))
+
+            plt.legend(loc="best")
+            plt.grid('off')
+            plt.show()
