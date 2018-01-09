@@ -1,4 +1,4 @@
-class clfSearch():
+class classifierSearch():
     """Class for hyper parameter search. This class starts the fitting for a clf model """
 
     def __init__(self, clf, new_para):
