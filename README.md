@@ -30,3 +30,14 @@ The function ```searcher.fit_and_eval()``` is using the multiprocessing library 
 
 At the end this results will be plotted by using the file 
 (http://scikit-learn.org/stable/auto_examples/model_selection/plot_multi_metric_evaluation.html#sphx-glr-auto-examples-model-selection-plot-multi-metric-evaluation-py).
+
+# Add your own clf and evaluator
+
+1. For the clf you need to change the classes in the clf modul. Beginning with the basicClf.py. 
+    1. Put all tensorflow tensors you will need for the training into the ```def __init__``` 
+    2. Change the ```def fit(self, data, outputFile)``` (here the training is taking place)
+    3. Add additional training scored inside your training and add them to ```self.trainingScore```
+
+2.  Rest will following soon ... 
+
+
