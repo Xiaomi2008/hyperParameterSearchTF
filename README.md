@@ -56,8 +56,15 @@ Tune an experiment with hyper-parameters.
           eval_input_fn=my_eval_input)
     tuner = create_tuner(study_configuration, objective_key)
     learn_runner.tune(experiment_fn=_create_my_experiment, tuner)
- ```
- ```
+```
+```Python
+def tune(experiment_fn, tuner):
+  while tuner.next_trial():
+     tuner.run_experiment(
+        _wrapped_experiment_fn_with_uid_check(
+        experiment_fn, require_hparams=True))
+```
+```
  Args:
     experiment_fn: A function that creates an `Experiment`. It should accept an
       argument `run_config` which should be used to create the `Estimator` (
