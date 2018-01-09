@@ -1,0 +1,8 @@
+tensorflow
+numpy
+os
+multiprocessing
+functools
+argparse
+sys
+matplotlib
