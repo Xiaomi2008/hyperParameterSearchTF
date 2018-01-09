@@ -29,12 +29,13 @@ and will replace only the default values if they are listed in the parameter dic
 The function ```searcher.fit_and_eval()``` is looping over all to parameters and evaluators and returns
 the results.
 
-`TODO` Use the multiprocessing library and with  ```searcher.fit_and_eval()``` for training and evaluating
+`TODO` Use the multiprocessing library and  ```searcher.fit_and_eval()``` for training and evaluating
 parallel. At the moment the lines are not working.
 
 ```Python
 pool = Pool()
 fit_and_eval_results = pool.map(_parallel_fit_eval_number, clf_numbers)
+--> cPickle.PicklingError: Can't pickle <type 'module'>: attribute lookup __builtin__.module failed
 ```
 
 At the end this results will be plotted by using the file 
