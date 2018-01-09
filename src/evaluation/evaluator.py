@@ -2,7 +2,7 @@
 
 import tensorflow as tf
 
-class evalHandler():
+class evaluator():
     """ clf evaluator handler """
 
     def __init__(self, inputDir, inputName):
