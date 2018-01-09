@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from multiprocessing import Pool
 import numpy as np
 from evaluation import evaluaterSearch
-from clf import clfSearch
+from clf import classifierSearch
 
 
 def _parallel_fit_eval(process_number, data, clfs, evaluators, scoring):
@@ -76,7 +76,7 @@ class MultiModelSearch(object):
         clfs = []
         for para_key in self.parameter[1]:
             for value in self.parameter[1][para_key]:
-                clfs.append(clfSearch.clfSearch(self.parameter[0], [para_key, value]))
+                clfs.append(classifierSearch.classifierSearch(self.parameter[0], [para_key, value]))
                 self._generate_results(self.parameter[0], para_key, value)
         self.clfs = clfs
 
@@ -122,8 +122,12 @@ class MultiModelSearch(object):
         clf_numbers = range(len(self.clfs))
         _parallel_fit_eval_number = partial(_parallel_fit_eval, data=self.data, clfs=self.clfs,
                                             evaluators=self.evaluators, scoring=self.scoring)
-        pool = Pool()
-        fit_and_eval_results = pool.map(_parallel_fit_eval_number, clf_numbers)
+        # ToDo do it parallel
+        #pool = Pool()
+        #fit_and_eval_results = pool.map(_parallel_fit_eval_number, clf_numbers)
+        fit_and_eval_results = []
+        for i in clf_numbers:
+            fit_and_eval_results.append(_parallel_fit_eval_number(i))
         self._update_result(fit_and_eval_results, clf_numbers)
 
     def plotResults(self, resultName, scoringName):
