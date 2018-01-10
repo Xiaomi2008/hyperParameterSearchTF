@@ -277,7 +277,7 @@ def get_test_inputs(batch_size, mnist_data):
 if __name__ == "__main__":
 
     hparams = HParams(
-        num_hidden_units=[100,200,300]
+        num_hidden_units=[100, 200, 300]
     )
 
     default_param = HParams(
