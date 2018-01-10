@@ -5,16 +5,14 @@ from tensorflow.contrib.training import HParams
 
 class tuner():
     """ Tuner class """
-
-    def __init__(self,default_param, hparams, FLAGS):
+    def __init__(self,default_param, hparams, model_dir):
         self.default_param_dict = default_param.values()
         self.hparams_dict = hparams.values()
-        self.model_dir = FLAGS.model_dir
         self.old_para = None
 
         # Set the run_config and the directory to save the model and stats
         run_config = tf.contrib.learn.RunConfig()
-        run_config = run_config.replace(model_dir=FLAGS.model_dir)
+        run_config = run_config.replace(model_dir=model_dir)
         self.run_config = run_config
 
     def next_trial(self):
@@ -42,7 +40,6 @@ class tuner():
         hparams = HParams()
         for k, v in self.default_param_dict.items():
             hparams.add_hparam(k, v)
-
 
         learn_runner.run(
             experiment_fn=experiment_fn,  # First-class function

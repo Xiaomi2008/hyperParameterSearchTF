@@ -288,6 +288,6 @@ if __name__ == "__main__":
         min_eval_frequency=100
     )
 
-    tuner = tuner(default_param, hparams, FLAGS)
+    tuner = tuner(default_param, hparams, FLAGS.model_dir)
 
     learn_runner.tune(experiment_fn=experiment_fn, tuner=tuner)
